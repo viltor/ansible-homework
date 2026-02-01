@@ -1,0 +1,31 @@
+---
+- name: Nginx telepítése és beállítása
+  hosts: web_servers
+  become: yes
+  vars:
+    - A_TE_NEVED: "Paller Endre"
+
+  tasks:
+    - name: Nginx csomag telepítése
+      yum:
+        name: nginx
+        state: present
+
+    - name: Egyedi index.html másolása a sablon alapján
+      template:
+        src: index.j2
+        dest: /usr/share/nginx/html/index.html
+        mode: '0644'
+      notify: Restart Nginx
+
+    - name: Nginx szolgáltatás elindítása és engedélyezése
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+        
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted        
